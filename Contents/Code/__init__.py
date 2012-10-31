@@ -46,14 +46,14 @@ def MainMenu():
                                                          title = show.get('title'),
                                                          url = show.get('url')),
                                    title    = show.get('title'),
-                                   thumb    = show.get('image', R(ICON)),
+                                   thumb    = Resource.ContentsOfURLWithFallback(url=show.get('image'), fallback=ICON),
                                    summary  = show.get('description')
                                    ))
         
     except :
         
-        dir.header = "UPS!!!"
-        dir.message = "Ingen forbindelse til VideoVideo"
+        oc.header = "UPS!!!"
+        oc.message = "Ingen forbindelse til VideoVideo"
     
     return oc
 
@@ -102,7 +102,7 @@ def getVideoObj(video = dict):
     return  VideoClipObject(url = url, 
                             title = video.get('title'), 
                             summary = video.get('shownotes'), 
-                            thumb = video.get('image',R(ICON)),
+                            thumb = Resource.ContentsOfURLWithFallback(url=show.get('image'), fallback=ICON),
                             duration = duration,
                             originally_available_at = Datetime.ParseDate(video.get('timestamp')))
     
