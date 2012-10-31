@@ -1,18 +1,15 @@
 TITLE       = 'VideoVideo.dk'
-PREFIX      = '/video/videovideo'
 PATH        = 'http://www.videovideo.dk/'
 ART         = 'art-default.jpg'
 ICON        = 'icon-default.png'
 
 ###################################################################################################
-
 def Start():
-    
+
     # Plugin setup
-    Plugin.AddPrefixHandler(PREFIX, MainMenu, TITLE, ICON, ART)
     Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
     Plugin.AddViewGroup("List", viewMode="List", mediaType="items")
-    
+
     # Object / Directory / VideoClip setup
     ObjectContainer.title1      = TITLE
     ObjectContainer.view_group  = 'InfoList'
@@ -21,63 +18,49 @@ def Start():
     DirectoryObject.art         = R(ART)
     VideoClipObject.thumb       = R(ICON)
     VideoClipObject.art         = R(ART)
-    
+
     # HTTP setup
     HTTP.CacheTime              = CACHE_1HOUR
     HTTP.Headers['User-Agent']  = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:12.0) Gecko/20100101 Firefox/12.0'
 
 ###################################################################################################
-
-@route('/video/videovideo')
+@handler('/video/videovideo', TITLE, thumb=ICON, art=ART)
 def MainMenu():
-    
+
     # create container
     oc = ObjectContainer()
-    
-    try:
-        
-        shows = JSON.ObjectFromURL(PATH + 'shows/json')
-        
-        for show in shows:
-            
-            # add elements to container
-            oc.add(DirectoryObject(
-                                   key      = Callback(BrowseShow, 
-                                                         title = show.get('title'),
-                                                         url = show.get('url')),
-                                   title    = show.get('title'),
-                                   thumb    = Resource.ContentsOfURLWithFallback(url=show.get('image'), fallback=ICON),
-                                   summary  = show.get('description')
-                                   ))
-        
-    except :
-        
-        oc.header = "UPS!!!"
-        oc.message = "Ingen forbindelse til VideoVideo"
-    
+    shows = JSON.ObjectFromURL(PATH + 'shows/json')
+
+    for show in shows:
+        # add elements to container
+        oc.add(DirectoryObject(
+                               key      = Callback(BrowseShow, 
+                                                     title = show.get('title'),
+                                                     url = show.get('url')),
+                               title    = show.get('title'),
+                               thumb    = Resource.ContentsOfURLWithFallback(url=show.get('image'), fallback=ICON),
+                               summary  = show.get('description')
+                               ))
+
     return oc
 
 ###################################################################################################
-
+@route('/video/videovideo/show')
 def BrowseShow(title = TITLE, url = ''):
-    
+
     # create container
     oc = ObjectContainer(view_group="List", title1 = TITLE, title2 = title)
-    
+
     try:
-        
         episodes = JSON.ObjectFromURL(url)
-    
-    except :
-    
+
+    except:
         raise Ex.MediaNotAvailable
-        
+
     for episode in episodes:
-        
         # add elements to container
         oc.add(getVideoObj(episode))
-    
-    
+
     return oc
 
 ###################################################################################################
