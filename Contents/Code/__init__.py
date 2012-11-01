@@ -49,7 +49,7 @@ def BrowseShow(title, url):
 	oc = ObjectContainer(view_group="List", title2=title)
 	episodes = JSON.ObjectFromURL(url)
 
-	for episode in episodes:
+	for video in episodes:
 		oc.add(VideoClipObject(
 			url = video.get('url'),
 			title = video.get('title'),
